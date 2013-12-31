@@ -43,6 +43,7 @@ var Page = (function PageClosure() {
       return this.pageDict.get(key);
     },
     inheritPageProp: function Page_inheritPageProp(key) {
+
       var dict = this.pageDict;
       var obj = dict.get(key);
       while (obj === undefined) {
@@ -124,7 +125,18 @@ var Page = (function PageClosure() {
         this.resourcesPromise = this.pdfManager.ensure(this, 'resources');
       }
       var promise = new Promise();
+        /*
+         * MATTS: EXCEPTIOANLLY HACKY CODE START:
+         */
+        if(!this.resources){
+            promise.resolve();
+            return promise;
+        }
+        /*
+         * End
+         */
       this.resourcesPromise.then(function resourceSuccess() {
+          //console.log("Resources:", this.resources);
         var objectLoader = new ObjectLoader(this.resources.map,
                                             keys,
                                             this.xref);
@@ -278,6 +290,8 @@ var PDFDocument = (function PDFDocumentClosure() {
       init.call(this, pdfManager, new Stream(arg), password);
     else
       error('PDFDocument: Unknown argument type');
+
+
   }
 
   function init(pdfManager, stream, password) {
@@ -325,6 +339,7 @@ var PDFDocument = (function PDFDocumentClosure() {
   PDFDocument.prototype = {
     parse: function PDFDocument_parse(recoveryMode) {
       this.setup(recoveryMode);
+
       try {
         // checking if AcroForm is present
         this.acroForm = this.catalog.catDict.get('AcroForm');

@@ -80,20 +80,36 @@ var Parser = (function ParserClosure() {
         return array;
       }
       if (isCmd(this.buf1, '<<')) { // dictionary or stream
+
         this.shift();
         var dict = new Dict(this.xref);
         while (!isCmd(this.buf1, '>>') && !isEOF(this.buf1)) {
           if (!isName(this.buf1)) {
-            info('Malformed dictionary, key must be a name object');
+            console.log('Malformed dictionary, key must be a name object');
             this.shift();
             continue;
           }
 
           var key = this.buf1.name;
+            if(key == 'BSISequences'){
+                var err = new Error("ERWER");
+                console.log(err.stack);
+            }
+            console.log("Key:" + key);//MATT: FOR THE LOVE OF GOD LOOK AT THIS LINE
+
           this.shift();
           if (isEOF(this.buf1))
             break;
-          dict.set(key, this.getObj(cipherTransform));
+            var obj = this.getObj(cipherTransform);
+            try{
+                if(typeof(obj) != 'object'){
+                    console.log("Value:" + obj);
+                } else{
+                    console.log("Value:" + JSON.stringify(obj));
+                }
+
+            }catch(e){}
+          dict.set(key, obj);
         }
         if (isEOF(this.buf1))
           error('End of file inside dictionary');
@@ -105,6 +121,7 @@ var Parser = (function ParserClosure() {
             this.makeStream(dict, cipherTransform) : dict;
         }
         this.shift();
+          console.log("--------------Ending---------------");
         return dict;
       }
       if (isInt(this.buf1)) { // indirect reference or integer
@@ -347,6 +364,7 @@ var Parser = (function ParserClosure() {
 
 var Lexer = (function LexerClosure() {
   function Lexer(stream, knownCommands) {
+      //console.log(bytesToString(stream.peekBytes()));
     this.stream = stream;
     this.nextChar();
 
@@ -357,7 +375,9 @@ var Lexer = (function LexerClosure() {
     // literal (e.g. 'f' and 'false') the following prefixes must be included,
     // 'fa', 'fal', 'fals'. The prefixes are not needed, if the command has no
     // other commands or literals as a prefix. The knowCommands is optional.
+
     this.knownCommands = knownCommands;
+
   }
 
   Lexer.isSpace = function Lexer_isSpace(ch) {
@@ -691,6 +711,7 @@ var Lexer = (function LexerClosure() {
 
 var Linearization = (function LinearizationClosure() {
   function Linearization(stream) {
+
     this.parser = new Parser(new Lexer(stream), false, null);
     var obj1 = this.parser.getObj();
     var obj2 = this.parser.getObj();

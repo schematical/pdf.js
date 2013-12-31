@@ -27,6 +27,7 @@ var Stream = (function StreamClosure() {
     this.pos = this.start;
     this.end = (start + length) || this.bytes.length;
     this.dict = dict;
+      console.log(this.dict);
   }
 
   // required methods for a stream. if a particular stream does not

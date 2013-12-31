@@ -244,6 +244,7 @@ var Annotation = (function AnnotationClosure() {
 
     var subtype = dict.get('Subtype');
     subtype = isName(subtype) ? subtype.name : '';
+      console.log("Subtype: " + subtype);
     if (!subtype) {
       return;
     }
@@ -251,7 +252,22 @@ var Annotation = (function AnnotationClosure() {
     var fieldType = Util.getInheritableProperty(dict, 'FT');
     fieldType = isName(fieldType) ? fieldType.name : '';
 
-    var Constructor = Annotation.getConstructor(subtype, fieldType);
+      /*
+       * MATTS: Magic Anotation special constructor thing
+       */
+
+      if(PDFJS.getAnnotationConstructor){
+        var Constructor = PDFJS.getAnnotationConstructor(dict);
+      }
+
+      if(!Constructor){
+          Constructor = Annotation.getConstructor(subtype, fieldType);
+      }
+      /*
+      End Matts code
+       */
+
+    //var Constructor = Annotation.getConstructor(subtype, fieldType);
     if (!Constructor) {
       return;
     }

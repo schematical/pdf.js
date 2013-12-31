@@ -435,7 +435,8 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
             break;
         }
       }
-
+        console.log("HIT2!");
+        console.log(gState);
       // This array holds the converted/processed state data.
       var gStateObj = [];
       var gStateMap = gState.map;
@@ -531,7 +532,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
 
     getOperatorList: function PartialEvaluator_getOperatorList(stream,
                                                                resources,
-                                                               operatorList) {
+                                                                       operatorList) {
 
       var self = this;
       var xref = this.xref;
@@ -552,6 +553,13 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
 
         var obj = parser.getObj();
 
+        if(obj && obj.cmd){
+            console.log(obj.cmd);
+        }
+        if(obj && (obj instanceof Dict)){
+            console.log("Ima dictionary!!!!");
+        }
+
         if (isEOF(obj)) {
           break;
         }
@@ -567,7 +575,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           }
 
           var fn = opSpec.id;
-
+            //console.log('FN:' + fn);
           // Validate the number of arguments for the command
           if (opSpec.variableArgs) {
             if (args.length > opSpec.numArgs) {
@@ -782,8 +790,10 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       var font = null;
       var charSpace = 0, wordSpace = 0;
       while (!isEOF(obj = parser.getObj())) {
+
         if (isCmd(obj)) {
           var cmd = obj.cmd;
+
           switch (cmd) {
             // TODO: Add support for SAVE/RESTORE and XFORM here.
             case 'Tf':
@@ -1034,6 +1044,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
         if (!isIdentityMap)
           error('ToUnicode file cmap translation not implemented');
       } else if (isStream(cmapObj)) {
+          console.log('hit4');
         var cmap = CMapFactory.create(cmapObj).map;
         // Convert UTF-16BE
         for (var i in cmap) {

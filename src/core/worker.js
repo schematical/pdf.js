@@ -145,6 +145,7 @@ var WorkerMessageHandler = PDFJS.WorkerMessageHandler = {
         },
 
         onError: function onError(status) {
+            console.log('onError: ' + status);
           if (status == 404) {
             var exception = new MissingPDFException( 'Missing PDF "' +
                 source.url + '".');

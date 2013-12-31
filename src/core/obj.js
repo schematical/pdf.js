@@ -425,6 +425,7 @@ var Catalog = (function CatalogClosure() {
           function (a) {
             var dict = a[0];
             var ref = a[1];
+
             return new Page(this.pdfManager, this.xref, pageIndex, dict, ref,
                             this.fontCache);
           }.bind(this)
@@ -623,6 +624,7 @@ var XRef = (function XRefClosure() {
 
       var obj = this.readXRefTable(parser);
 
+
       // Sanity check
       if (!isCmd(obj, 'trailer'))
         error('Invalid XRef table: could not find trailer dictionary');
@@ -637,6 +639,7 @@ var XRef = (function XRefClosure() {
       // The parser goes through the entire stream << ... >> and provides
       // a getter interface for the key-value table
       var dict = parser.getObj();
+
       if (!isDict(dict))
         error('Invalid XRef table: could not parse trailer dictionary');
 
@@ -657,6 +660,7 @@ var XRef = (function XRefClosure() {
       // ...
 
       var stream = parser.lexer.stream;
+
       var tableState = this.tableState;
       stream.pos = tableState.streamPos;
       parser.buf1 = tableState.parserBuf1;
@@ -681,6 +685,7 @@ var XRef = (function XRefClosure() {
 
         // Inner loop is over objects themselves
         for (var i = tableState.entryNum; i < count; i++) {
+
           tableState.streamPos = stream.pos;
           tableState.entryNum = i;
           tableState.parserBuf1 = parser.buf1;
@@ -755,6 +760,7 @@ var XRef = (function XRefClosure() {
 
     readXRefStream: function XRef_readXRefStream(stream) {
       var i, j;
+
       var streamState = this.streamState;
       stream.pos = streamState.streamPos;
 
@@ -825,6 +831,7 @@ var XRef = (function XRefClosure() {
           token += String.fromCharCode(ch);
           ch = data[offset];
         }
+          //console.log(token);
         return token;
       }
       function skipUntil(data, offset, what) {
@@ -883,8 +890,9 @@ var XRef = (function XRefClosure() {
             offset: position,
             gen: m[2] | 0,
             uncompressed: true
-          };
+          }
 
+          //console.log('???'+token);
           var contentLength = skipUntil(buffer, position, endobjBytes) + 7;
           var content = buffer.subarray(position, position + contentLength);
 
@@ -902,6 +910,8 @@ var XRef = (function XRefClosure() {
           position += token.length + 1;
       }
       // reading XRef streams
+        //console.log(bytesToString(stream.peekBytes()));
+
       for (var i = 0, ii = xrefStms.length; i < ii; ++i) {
         this.startXRefQueue.push(xrefStms[i]);
         this.readXRef(/* recoveryMode */ true);
@@ -933,11 +943,12 @@ var XRef = (function XRefClosure() {
       var stream = this.stream;
 
       try {
+
+
         while (this.startXRefQueue.length) {
           var startXRef = this.startXRefQueue[0];
 
           stream.pos = startXRef;
-
           var parser = new Parser(new Lexer(stream), true, null);
           var obj = parser.getObj();
           var dict;
@@ -1042,10 +1053,12 @@ var XRef = (function XRefClosure() {
         if (e.gen != gen)
           error('inconsistent generation in XRef');
         stream = this.stream.makeSubStream(e.offset);
+
         parser = new Parser(new Lexer(stream), true, this);
         var obj1 = parser.getObj();
         var obj2 = parser.getObj();
         var obj3 = parser.getObj();
+
         if (!isInt(obj1) || obj1 != num ||
             !isInt(obj2) || obj2 != gen ||
             !isCmd(obj3)) {
@@ -1088,6 +1101,7 @@ var XRef = (function XRefClosure() {
       if (!isInt(first) || !isInt(n)) {
         error('invalid first and n parameters for ObjStm stream');
       }
+
       parser = new Parser(new Lexer(stream), false, this);
       parser.allowStreams = true;
       var i, entries = [], nums = [];
